@@ -25,6 +25,31 @@ function Card(suit, num) {
         return mSuit;
     };
     
+    /**
+     * Return a Suit name as a string
+     */
+    this.getSuitString = function() {
+         var suitString;
+        switch(mSuit) {
+            case 1: 
+               suitString = "Hearts";
+                break;
+            case 2:
+                suitString = "Diamonds";
+                break;
+            case 3:
+                suitString = "Clubs";
+                break;
+            case 4:
+                suitString = "Spades";
+                break;
+            default:
+                suitString = "";
+        }
+        
+        return suitString;
+    };
+    
     this.getNum = function() {
         return mNum;
     };
@@ -124,13 +149,42 @@ function Hand() {
     };
     
     /**
+     * Calculate the score of the hand
+     */
+    this.score = function() {
+        var total = 0;
+        var acecount = 0;
+        for (var i = 0; i < cards.length; ++i) {
+            var val = cards[i].cardValue();
+            if (val === 11) {
+              ++acecount;
+            } 
+            total += cards[i].cardValue();
+        }
+        
+        while (acecount > 0) {
+         if (total > 21) {
+            total -= 10;
+            --acecount;
+         } else {
+            return total;   
+         }
+        }
+        
+        return total;
+    };
+    
+    /**
      * Display the deck in the console for debug
      */
     this.toString = function() {
+        // for now return a string
+        var msg = "";
         for (var i = 0; i < cards.length; ++i) {
-            console.log("Suit: " + cards[i].getSuit()
-                       + ", Number: " + cards[i].getNum());
+            msg += cards[i].getNum() + " of " + cards[i].getSuitString() + "<br />";
         }  
+        
+        return msg;
     };
 }
 
@@ -145,6 +199,7 @@ var standBtn = $("#stand-btn");
 var deck;
 var playerHand;
 var dealerHand;
+var isPlaying = false;
 
 /**
  * Set the game buttons state
@@ -165,20 +220,69 @@ function setGameBtnState(isReadyState) {
  * Initialize the blackjack game
  */
 function playBlackJack() {
+    isPlaying = true; 
+        // disable the start button, enable hit and stand
+        setGameBtnState(false);
+        deck = new Deck();
+        deck.shuffle();
+        playerHand = new Hand();
+        playerHand.hit(deck.deal());
+        playerHand.hit(deck.deal());
+        dealerHand = new Hand();
+        dealerHand.hit(deck.deal());
+        dealerHand.hit(deck.deal());
     
-    // disable the start button, enable hit and stand
-    setGameBtnState(false);
-    deck = new Deck();
-    deck.shuffle();
-    playerHand = new Hand();
-    playerHand.hit(deck.deal());
-    playerHand.hit(deck.deal());
-    dealerHand = new Hand();
-    dealerHand.hit(deck.deal());
-    dealerHand.hit(deck.deal());
+        // show player hand
+        $("#player-cards").html(playerHand.toString());
+        $("#dealer-cards").html(dealerHand.toString());
         
+        
+        hitBtn.click(function(){
+            if (isPlaying) {
+                playerHand.hit(deck.deal());
+                $("#player-cards").html(playerHand.toString());
+            }
+        });
     
+        standBtn.click(function() {
+            endBlackJack();
+        });
+
 };
+
+/**
+ * Calculate who won and return an appropriate string
+ */
+var declareWinner = function(userHand, dealerHand) {
+    var userScore = userHand.score();
+    var dealerScore = dealerHand.score();
+    
+    if (userScore > 21) {
+        if (dealerScore > 21) {
+            return "You tied!";
+        } else {
+            return "You lose!";
+        }
+    } else if (dealerScore > 21) {
+        return "You win!";
+    } else if (userScore > dealerScore) {
+        return "You win!";
+    } else if (userScore === dealerScore) {
+        return "You tied!";
+    } else {
+        return "You lose!";   
+    }
+};
+
+/**
+ * End the blackjack game
+ */
+function endBlackJack() {
+    isPlaying = false;
+    var endMsg = declareWinner(playerHand, dealerHand);
+    $("#outcome").html("<h3>" + endMsg + "</h3>");
+    
+}
 
 ////////// Click events /////////
 $(window).load(setGameBtnState(true));

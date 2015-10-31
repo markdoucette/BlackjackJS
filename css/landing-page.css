@@ -41,8 +41,8 @@ h6 {
 
 .intro-message {
     position: relative;
-    padding-top: 20%;
-    padding-bottom: 20%;
+    padding-top: 5%;
+    padding-bottom: 10%;
 }
 
 .intro-message > h1 {
@@ -59,6 +59,13 @@ h6 {
 
 .intro-message > h3 {
     text-shadow: 2px 2px 3px rgba(0,0,0,0.6);
+}
+
+#playing-area {
+    position: relative;
+    padding-top: 5%;
+    padding-bottom: 5%;
+    height: 15em;
 }
 
 @media(max-width:767px) {
@@ -109,7 +116,7 @@ h6 {
 
 .section-heading-spacer {
     float: left;
-    width: 200px;
+    width: 100%;
     border-top: 3px solid #e7e7e7;
 }
 
