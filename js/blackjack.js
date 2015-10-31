@@ -138,11 +138,36 @@ function Hand() {
  * Game runner
  * @author Mark Doucette
  *************************************/
+var startBtn = $("#start-btn");
+var hitBtn = $("#hit-btn");
+var standBtn = $("#stand-btn");
+
 var deck;
 var playerHand;
 var dealerHand;
 
-function PlayBlackJack() {
+/**
+ * Set the game buttons state
+ */
+function setGameBtnState(isReadyState) {
+   // if we are in ready state then only the Start button is enabled
+    if (isReadyState) {
+      hitBtn.attr("disabled", "disabled");  
+      standBtn.attr("disabled", "disabled");  
+    } else {
+      startBtn.attr("disabled", "disabled");
+      hitBtn.removeAttr("disabled");  
+      standBtn.removeAttr("disabled");  
+    }
+}
+
+/**
+ * Initialize the blackjack game
+ */
+function playBlackJack() {
+    
+    // disable the start button, enable hit and stand
+    setGameBtnState(false);
     deck = new Deck();
     deck.shuffle();
     playerHand = new Hand();
@@ -154,6 +179,11 @@ function PlayBlackJack() {
         
     
 };
+
+////////// Click events /////////
+$(window).load(setGameBtnState(true));
+startBtn.click(playBlackJack);
+
 
 
 
