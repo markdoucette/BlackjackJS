@@ -68,6 +68,16 @@ h6 {
     height: 15em;
 }
 
+.game-heading {
+    text-transform: uppercase;
+}
+
+.game-cards {
+    border: 1px solid black;
+    border-radius: 1em;
+    background-color: #D80D30;
+}
+
 @media(max-width:767px) {
     .intro-message {
         padding-bottom: 15%;

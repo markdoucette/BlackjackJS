@@ -19,6 +19,7 @@ function Card(suit, num) {
     // data members
     var mSuit = suit; // private var representing the card suit as an int
     var mNum = num; // private var representing the number 1-13 of the card
+    var mNumString; // private var representing the number string of the card A - 10, J, Q, K
 
     // public getters
     this.getSuit = function() {
@@ -53,6 +54,27 @@ function Card(suit, num) {
     this.getNum = function() {
         return mNum;
     };
+    
+    this.getNumString = function() {
+        switch(mNum) {
+            case 1:
+                mNumString = "Ace";
+                break;
+            case 11:
+                mNumString = "Jack";
+                break;
+            case 12:
+                mNumString = "Queen";
+                break;
+            case 13:
+                mNumString = "King";
+                break;
+            default:
+                mNumString = "" + mNum;
+        }        
+        
+        return mNumString;
+    };
 
     /**
      * Since card number is between 1 and 13 (13 cards per suit)
@@ -67,6 +89,10 @@ function Card(suit, num) {
         } else {
             return mNum; // no face card so return actual number as value
         }
+    };
+    
+    this.toString = function() {
+         return this.getNumString() + " of " + this.getSuitString();   
     };
 }
 
@@ -181,7 +207,7 @@ function Hand() {
         // for now return a string
         var msg = "";
         for (var i = 0; i < cards.length; ++i) {
-            msg += cards[i].getNum() + " of " + cards[i].getSuitString() + "<br />";
+            msg += cards[i].toString() + "<br />";
         }  
         
         return msg;
@@ -195,6 +221,8 @@ function Hand() {
 var startBtn = $("#start-btn");
 var hitBtn = $("#hit-btn");
 var standBtn = $("#stand-btn");
+var playAgainBtn = $("#play-again");
+playAgainBtn.hide();
 
 var deck;
 var playerHand;
@@ -234,18 +262,28 @@ function playBlackJack() {
     
         // show player hand
         $("#player-cards").html(playerHand.toString());
-        $("#dealer-cards").html(dealerHand.toString());
+        if (playerHand.score() === 21) { // dealt a 2 card blackjack
+            endBlackJack();
+        }
         
         
         hitBtn.click(function(){
             if (isPlaying) {
                 playerHand.hit(deck.deal());
                 $("#player-cards").html(playerHand.toString());
+                if (playerHand.score() >= 21) {
+                    endBlackJack();
+                    return;
+                }
             }
         });
     
         standBtn.click(function() {
             endBlackJack();
+        });
+    
+        playAgainBtn.click(function() {
+            playAgain();
         });
 
 };
@@ -257,7 +295,10 @@ var declareWinner = function(userHand, dealerHand) {
     var userScore = userHand.score();
     var dealerScore = dealerHand.score();
     
-    if (userScore > 21) {
+     if ( userScore === 21) {
+         return "Blackjack! You win!!!";
+     }
+     else if (userScore > 21) {
         if (dealerScore > 21) {
             return "You tied!";
         } else {
@@ -278,10 +319,24 @@ var declareWinner = function(userHand, dealerHand) {
  * End the blackjack game
  */
 function endBlackJack() {
+    $("#player-cards").html(playerHand.toString());
+    while (dealerHand.score() < 17) {
+        dealerHand.hit(deck.deal());  
+    }
+    
+    $("#dealer-cards").html(dealerHand.toString());
     isPlaying = false;
     var endMsg = declareWinner(playerHand, dealerHand);
-    $("#outcome").html("<h3>" + endMsg + "</h3>");
-    
+    $("#outcome").html(endMsg);
+    setGameBtnState(true);
+    $("#play-again").toggle(1000);
+}
+
+/**
+ * Play again - using reload
+ */
+function playAgain() {
+    location.reload(true) //force reload
 }
 
 ////////// Click events /////////
