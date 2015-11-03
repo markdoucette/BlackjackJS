@@ -20,6 +20,8 @@ function Card(suit, num) {
     var mSuit = suit; // private var representing the card suit as an int
     var mNum = num; // private var representing the number 1-13 of the card
     var mNumString; // private var representing the number string of the card A - 10, J, Q, K
+    var mImgBasePath = "img/cards/"; // base image directory
+    var mImgString; // private var with path to matching image.
 
     // public getters
     this.getSuit = function() {
@@ -74,6 +76,13 @@ function Card(suit, num) {
         }        
         
         return mNumString;
+    };
+
+    /**
+     * Return a string path/name of the associated image file
+     */
+    this.getImageString = function() {
+	return mImgBasePath + this.getNumString().toLowerCase() + "_of_" + this.getSuitString().toLowerCase() + ".png";
     };
 
     /**
@@ -265,7 +274,6 @@ function playBlackJack() {
         if (playerHand.score() === 21) { // dealt a 2 card blackjack
             endBlackJack();
         }
-        
         
         hitBtn.click(function(){
             if (isPlaying) {
